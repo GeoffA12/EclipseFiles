@@ -1,0 +1,59 @@
+3. in the test, StackTest.java
+put a breakpoint at line: 50
+debug to that break point
+a) what is the max size of s1? 3
+
+b) what is the max size of s2? 2
+
+c) what is the max size of s3? 4
+
+4. put a breakpoint at line 77.
+step over method call to toString().
+a) what is the value of str [t, h, i, r, d, 
+, s, e, c, o, n, d, 
+, f, i, r, s, t, 
+]
+
+5. put a breakpoint at line 120.
+a) what is the current contents of s2? 2
+
+6. put a breakpoint at line 188
+a) what is the current value of retStr? [2, 
+, 2, 
+]
+
+7. Now we will debug some of QueueTest.
+put a breakpoint at line 37
+a) what is the value of q3's max size? 4
+
+b) what is the value of q1's max size 3
+
+
+8. put a breakpoint at line 97.
+a) what is the value of variable out? [s, e, c, o, n, d, 
+, t, h, i, r, d, 
+]
+
+9. put a breakpoint at line 169
+a) what is the current size of q2? 2
+
+10. put a breakpoint at line 263
+a) what is the value of variable res? [2, 
+, 3, 
+, 4, 
+]
+
+
+
+Using the mouse hover over each of the following "icons" to determine the keyboard equivalent key
+for each of the following:
+
+11. In the debugger, which key is equivalent to "step into a method call" ? F6
+
+12. In the debugger, which key is equivalent to "step over a method call" ? F6
+
+
+13. In the debugger, which key is equivalent to "step return from a method" ? F7
+
+
+14. In the debugger, which key is equivalent to "resume execution" ? F8

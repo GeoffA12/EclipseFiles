@@ -1,0 +1,346 @@
+Geoff Arroyo 
+Thursday 2:00 - 3:15 COSC 2425
+Lab 9
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+package smallpet;
+
+public class Dog extends SmallPet{
+	private boolean leashTrained;
+	private DogSize dogSize;
+	// default constructor for Dog class uses default chip id, default name, default birth date, 
+	// MEDIUM for size, and false for leash trained
+	public Dog() {
+		super();
+		this.dogSize = DogSize.MEDIUM;
+		this.leashTrained = false;
+	}
+	// public Dog(String aChipId); uses size MEDIUM, and false 
+	// for leash trained, and defaults for name, birthdate
+	public Dog(String aName) {
+		super(aName);
+		this.dogSize = DogSize.MEDIUM;
+		this.leashTrained = false;
+	}
+	// toString(): includes size and info about is or is not leash trained,
+	// be sure to put "DOG" in front of the returned String.
+	public String toString() {
+		
+		String retValue = "DOG ";
+		retValue += super.toString();
+
+		retValue += isLeashTrained() + " ";
+		retValue += getDogSize();
+		return retValue;
+	}
+	
+	// returns the field of dogSize for the current Dog instance
+	public DogSize getDogSize() {
+		return this.dogSize;
+	}
+	
+	// Set the leashTrained field for the current Dog instance
+	public void setLeashTrained(boolean isTrained) {
+		this.leashTrained = isTrained;
+	}
+	
+	// Return the leashTrained field for the current Dog instance
+	public boolean isLeashTrained() {
+		return this.leashTrained;
+	}
+	
+	// Set the dogSize field for the current Dog instance
+	public void setDogSize(DogSize aSize) {
+		this.dogSize = aSize;
+	}
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+package smallpet;
+
+public class Cat extends SmallPet{
+	private CatColor catColor;
+	// public Cat(); uses default name, chipId, birthdate uses BLACK as the Default color
+	public Cat() {
+		super();
+		this.catColor = CatColor.BLACK;
+	}
+	//  public Cat(String aChipId); uses default for all but chipId.
+	//  Use the Black CatColor enum value as default. 
+	public Cat(String aChipId) {
+		super(aChipId);
+		this.catColor = CatColor.BLACK;
+	}
+	// return the catColor field for the current Cat instance
+	public CatColor getCatColor() {
+		return this.catColor;
+	}
+	// set the catColor field of the current Cat instance
+	public void setCatColor(CatColor aColor) {
+		this.catColor = aColor;
+	}
+	// toString() includes SmallPet's toString(), word "CAT" AT 
+	// FRONT of String and the color of this cat
+	public String toString() {
+		String retValue = "CAT ";
+		retValue += super.toString();
+		retValue += this.getCatColor();
+		return retValue;
+	}
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+package smallpet;
+
+public class Bird extends SmallPet{
+	private BirdType birdType;
+	// Default Constructor for Bird class. Uses default name, birthdate, chip id, and PARROT as type of bird
+	public Bird() {
+		super();
+		this.birdType = BirdType.PARROT;
+	}
+	// Constructor for Bird class. Use PARROT as the default value for a bird's type
+	// Use the string input as the bird's chipId
+	public Bird(String aChipId) {
+		super(aChipId);
+		this.birdType = BirdType.PARROT;
+	}
+	// Return the Bird Type field for the current bird instance
+	public BirdType getBirdType() {
+		return this.birdType;
+	}
+	// Set the bird type field for the current bird instance
+	public void setBirdType(BirdType aBirdType) {
+		this.birdType = aBirdType;
+	}
+	// toString() that uses super.toString() and adds additional attribute, 
+	// bird type with (no newlines), be sure to put "BIRD" in front of returned String.
+	public String toString() {
+		String retValue = "BIRD ";
+		retValue += super.toString();
+		retValue += this.getBirdType();
+		return retValue;
+	}
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Enter your name: Geoff
+Begin testing of SmallPetTest for Geoff
+Execution BEGINS  at: 2019-03-15 02:14:56
+Dog class testing....
+dog1: DOG Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ false MEDIUM
+dog1: DOG Chip Id: 11AA 19 years old born: 2/1/2000  $$$$ false MEDIUM
+here is dog1: DOG Chip Id: 11AA 19 years old born: 2/1/2000  $$$$ false MEDIUM
+dog1: DOG Chip Id: 11AA 6 years old born: 4/4/2013  Luckiest Dog Ever true TINY
+End of Dog class testing....
+Cat class testing....
+cat1: CAT Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ BLACK
+cat1: CAT Chip Id: 111Z 5 years old born: 2/22/2014  Count Drake BLACK
+cat2: CAT Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ BLACK
+cat2: CAT Chip Id: 111Z 5 years old born: 2/22/2014  Magic Hero TORTISE_SHELL
+End of Cat class testing....
+Bird class testing....
+bird1: BIRD Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ PARROT
+bird1: BIRD Chip Id: JKAB 4 years old born: 4/15/2015  Tweety Tweet PARROT
+bird1: BIRD Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ PARROT
+bird1: BIRD Chip Id: JKAB 4 years old born: 4/15/2015  Captain America GOOSE
+End of Bird class testing....
+Execution ENDS  at: 2019-03-15 02:14:56
+End of testing of SmallPetTest for Geoff
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+package smallpet;
+
+import java.io.PrintWriter;
+import java.util.GregorianCalendar;
+import java.util.Scanner;
+
+public class SmallPetUtilsImpl {
+	//receives: inFile, a Scanner instance that is open and ready to read data from
+	// file format: kind of pet {space} chipId {space} pet name {newline} 
+	// if DOG then 2nd line is birthdate {space} (yes or no) followed by {space} then size.
+	// if CAT then 2nd line is birthdate {space} cat color then {newline}
+	// if BIRD then 2nd line is birthdate {space} bird type then {newline}
+	//returns: a single populated instance of a SmallPet type with data from inFile if all data is there, 
+	// returns null if no data found (end of input) for a small pet or if 
+	// any mismatch of data or missing expected data
+	// example file contents that should be able to be read in, 1 at a time from a file
+	// DOG k34R Dakota Charge
+	// 8/12/2016 yes SMALL
+	// CAT 8933 Grand Kane
+	// 5/12/2009 CALICO
+	// BIRD H4B3 Elliot Chatter
+	// 4/19/2009 PARROT
+	public static SmallPet readFromScanner(Scanner inFile) {
+		String petType;
+		String chipId;
+		String name;
+		String birthDate;
+		String isTrained;
+		String sizeOfDog;
+		String birdType;
+		GregorianCalendar date;
+		DogSize valOfSize;
+		CatColor aColor;
+		BirdType aBirdType;
+		boolean trained;
+		// Check if the file has a valid first line of text. If not, then it's bad input, and we return null. 
+		if (inFile.hasNext()) {
+			petType = inFile.next();
+		}
+		else {
+			return null;
+		}
+		if (inFile.hasNext()) {
+			chipId = inFile.next();
+		}
+		else {
+			return null;
+		}
+		if (inFile.hasNext()) {
+			name = inFile.next();
+		}
+		else {
+			return null;
+		}
+		// Use a conditional branch that looks at the first text input read from scanner 
+		// to determine which type of SmallPet data type we will construct and return to caller. 
+		if (petType.equals("DOG")) {
+			petType = "DOG";
+			if (inFile.hasNext()) {
+				inFile.nextLine();
+				birthDate = inFile.next();
+				isTrained = inFile.next();
+				sizeOfDog = inFile.next();
+				date = utils.MyUtils.stringToDate(birthDate);
+				valOfSize = DogSize.valueOf(sizeOfDog);
+				trained = Boolean.valueOf(isTrained);
+				Dog aDog = new Dog(chipId);
+				aDog.setLeashTrained(trained);
+				aDog.setPetName(name);
+				aDog.setBirthDate(date);
+				aDog.setDogSize(valOfSize);
+				return aDog;
+			}
+			else {
+				return null;
+			}
+		}
+		else if (petType.equals("CAT")) {
+			petType = "CAT";
+			if (inFile.hasNextLine()) {
+				inFile.nextLine();
+				birthDate = inFile.next();
+				birdType = inFile.next();
+				date = utils.MyUtils.stringToDate(birthDate);
+				aColor = CatColor.valueOf(birdType);
+				Cat aCat = new Cat(chipId);
+				aCat.setCatColor(aColor);
+				aCat.setBirthDate(date);
+				aCat.setPetName(name);
+				return aCat;
+			}
+			else {
+				return null;
+			}
+		}
+		else if (petType.equals("BIRD")) {
+			petType = "BIRD";
+			if (inFile.hasNextLine()) {
+				inFile.nextLine();
+				birthDate = inFile.next();
+				birdType = inFile.next();
+				date = utils.MyUtils.stringToDate(birthDate);
+				aBirdType = BirdType.valueOf(birdType);
+				Bird aBird = new Bird(chipId);
+				aBird.setBirdType(aBirdType);
+				aBird.setBirthDate(date);
+				aBird.setPetName(name);
+				return aBird;
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			return null;
+		}
+	}
+	
+	//receives: outFile, a PrintWriter instance that is open and ready to receive output
+	//task: received smallPet is output to outFile in program readable format (so that it could be read back in correctly)
+	// returns: nothing
+	// example file output for 3 small pet types (a dog, a cat, a bird)
+	// DOG k34R Dakota Charge
+	// 8/12/2016 yes SMALL
+	// CAT 8933 Grand Kane
+	// 5/12/2009 CALICO
+	// BIRD H4B3 Elliot Chatter
+	// 4/19/2009 PARROT
+	public static void writeToFile(PrintWriter out, SmallPet housePet) {
+		if (housePet instanceof Dog) {
+			Dog aDog = (Dog) housePet;
+			out.print("DOG ");
+			out.print(housePet.getChipId() + " ");
+			out.print(housePet.getPetName());
+			out.println();
+			out.print(housePet.getBirthDateAsString() + " ");
+			out.print(aDog.isLeashTrained() + " ");
+			out.print(aDog.getDogSize());
+			out.println();
+		}
+		else if (housePet instanceof Cat) {
+			Cat aCat = (Cat) housePet;
+			out.print("CAT ");
+			out.print(housePet.getChipId() + " ");
+			out.print(housePet.getPetName() + " ");
+			out.println();
+			out.print(housePet.getBirthDateAsString() + " ");
+			out.print(aCat.getCatColor());
+			out.println();
+		}
+		else if (housePet instanceof Bird) {
+			Bird aBird = (Bird) housePet;
+			out.print("BIRD ");
+			out.print(housePet.getChipId() + " ");
+			out.print(housePet.getPetName());
+			out.println();
+			out.print(housePet.getBirthDateAsString() + " ");
+			out.print(aBird.getBirdType());
+			out.println();
+		}
+		else {
+			return;
+		}
+	}
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+Enter your name: Geoff
+Begin testing of SmallPetTest for Geoff
+Execution BEGINS  at: 2019-03-15 02:18:59
+Dog class testing....
+dog1: DOG Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ false MEDIUM
+dog1: DOG Chip Id: 11AA 19 years old born: 2/1/2000  $$$$ false MEDIUM
+here is dog1: DOG Chip Id: 11AA 19 years old born: 2/1/2000  $$$$ false MEDIUM
+dog1: DOG Chip Id: 11AA 6 years old born: 4/4/2013  Luckiest Dog Ever true TINY
+End of Dog class testing....
+Cat class testing....
+cat1: CAT Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ BLACK
+cat1: CAT Chip Id: 111Z 5 years old born: 2/22/2014  Count Drake BLACK
+cat2: CAT Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ BLACK
+cat2: CAT Chip Id: 111Z 5 years old born: 2/22/2014  Magic Hero TORTISE_SHELL
+End of Cat class testing....
+Bird class testing....
+bird1: BIRD Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ PARROT
+bird1: BIRD Chip Id: JKAB 4 years old born: 4/15/2015  Tweety Tweet PARROT
+bird1: BIRD Chip Id: AAAA 19 years old born: 2/1/2000  $$$$ PARROT
+bird1: BIRD Chip Id: JKAB 4 years old born: 4/15/2015  Captain America GOOSE
+End of Bird class testing....
+Execution ENDS  at: 2019-03-15 02:18:59
+End of testing of SmallPetTest for Geoff

@@ -1,0 +1,856 @@
+Geoff Arroyo
+Assignment 6
+-------------------------------------------------------------------------------------------------------------------------------------
+
+package reservation;
+
+public class CarReservation extends Reservation{
+	private RentalCar aCar;
+	
+	// 1 argument constructor for the CarReservation child class. The constructor receives a string that is the confirmation ID.
+	// call the super() class constructor using this String. Set the aCar member variable to a default constructed Rental Car object.
+	public CarReservation(String confirmNumber) {
+		super(confirmNumber);
+		this.aCar = new RentalCar();
+	}
+	
+	// The toString() method for the CarReservation class must include "CAR" at the beginning of the string,
+	// and must make use of the sper.toString() method. 
+	public String toString() {
+		String retValue = "CAR " + super.toString();
+		retValue += this.aCar.toString();
+		return retValue;
+	}
+	
+	// Getter for the current CarReservation's aCar field
+	public RentalCar getCar() {
+		return this.aCar;
+	}
+	
+	// Setter for the current CarReservation's aCar field
+	public void setCar(RentalCar cars) {
+		this.aCar = cars;
+	}
+	
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+package reservation;
+
+public class HotelReservation extends Reservation{
+	private String hotelName;
+	private int numPersons;
+	public static final String DEFAULT_HOTEL_NAME = "$$$$";
+	
+	// 1 argument constructor for the HotelReservation class. This constructor receives a string which is the confirmation ID attribute 
+	// that is written in the reservation superclass. Call the super() constructor with this parameter. 
+	// Set the hotel name to the default hotel name, and the numPersons field to 1.
+	public HotelReservation(String confirmNumber) {
+		super(confirmNumber);
+		this.hotelName = DEFAULT_HOTEL_NAME;
+		this.numPersons = 1;
+	}
+	
+	// Include a toString() method for the HotelReservation class that has HOTEL at the front of the string
+	// and uses the super.toString() method. There should be no newlines in the string
+	public String toString() {
+		String retValue = "HOTEL " + super.toString();
+		retValue += this.hotelName + " " + this.numPersons;
+		return retValue;
+	}
+	
+	// Return the HotelReservation hotelName field
+	public String getHotelName() {
+		return this.hotelName;
+	}
+	
+	// Return the HotelReservation instance numPersons field
+	public int getNumPersons() {
+		return this.numPersons;
+	}
+	
+	// Setter for the hotelName field of the current HotelReservation instance. Make sure the string hotelName is 
+	// properly formatted.
+	public void setHotelName(String aHotelName) {
+		aHotelName = utils.MyUtils.properFormat(aHotelName);
+		if (aHotelName.length() == 0) {
+			aHotelName = DEFAULT_HOTEL_NAME;
+		}
+		this.hotelName = aHotelName;
+	}
+	
+	// Setter for the numPersons field of the current HotelReservation instance. Make sure the input is between 1 and 100.
+	public void setNumPersons(int aNumPersons) {
+		if (aNumPersons < 1 || aNumPersons > 100) {
+			aNumPersons = 1;
+		}
+		this.numPersons = aNumPersons;
+	}
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+package reservation;
+
+public class FlightReservation extends Reservation{
+	private String depart;
+	private String arrive;
+	private final String DEFAULT_CODE = "AUS";
+
+	// 1 argument constructor for the FlightReservation child class. The constructor takes in one String variable,
+	// which is the confirmation ID. Call super() class constructor with this confirmation ID. 
+	// Set the depart and arrive fields to the DEFAULT_CODE constant.
+	public FlightReservation(String confirmNumber) {
+		super(confirmNumber);
+		this.depart = DEFAULT_CODE;
+		this.arrive = DEFAULT_CODE;
+	}
+	
+	// The toString() method for the FlightReservation class should include "FLIGHT" at the beginning of the string.
+	// and make use of the super.toString() method. 
+	public String toString() {
+		String retValue = "FLIGHT " + super.toString();
+		retValue += this.depart + " " + this.arrive;
+		return retValue;
+	}
+	
+	// Getter for the current FlightReservation instance's arrive field
+	public String getArrivalCode() {
+		return this.arrive;
+	}
+	
+	// Getter for the current FlightReservation instance's depart field
+	public String getDepartCode() {
+		return this.depart;
+	}
+	
+	// Setter for the current FlightReservation instance's arrive field
+	public void setArrivalCode(String aCode) {
+		int charCount = 0;
+		aCode = aCode.toUpperCase();
+		for (int x = 0; x < aCode.length(); ++x) {
+			char current = aCode.charAt(x);
+			if (Character.isLetter(current)) {
+				charCount += 1;
+			}
+		}
+		if (charCount != 3) {
+			aCode = DEFAULT_CODE;
+		}
+		this.arrive = aCode;
+	}
+	
+	// Setter for the current FlightReservation instance's depart field
+	public void setDepartCode(String aCode) {
+		int charCount = 0;
+		aCode = aCode.toUpperCase();
+		for (int x = 0; x < aCode.length(); ++x) {
+			char current = aCode.charAt(x);
+			if (Character.isLetter(current)) {
+				charCount += 1;
+			}
+		}
+		if (charCount != 3) {
+			aCode = DEFAULT_CODE;
+		}
+		this.depart = aCode;
+	}
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+package reservationlist;
+
+import java.util.Arrays;
+import java.util.GregorianCalendar;
+
+import reservation.Reservation;
+
+public class ReservationListImpl implements ReservationList{
+	private Node<Reservation> first;
+	private int count;
+	
+	// Default constructor for the ReservationListImpl() class. 
+	// Set the count field to 0 and the first Node to null for this instance.
+	public ReservationListImpl() {
+		this.first = null;
+		this.count = 0;
+	}
+	
+	// toString method for the ReservationListImpl() class. 
+	// The returned string should have each Reservation instance toString method 
+	// With a new line separating each reservation instance
+	public String toString() {
+		String retValue = "";
+		Node<Reservation> head = this.first;
+		while(head != null) {
+			retValue += head.data.toString();
+			retValue += "\n";
+			head = head.link;
+		}
+		return retValue;
+	}
+	//receives: nothing
+	// returns: the number reservations in the list
+	public int getSize() {
+		return this.count;
+	}
+
+	// receives: nothing
+	// returns:  a String of all reservations that have either start or end date on received date
+	//      each reservation is separated by a newline character and specified by descriptor. 
+	//      Returns an empty string if no reservations occurred on received date.
+	public String getReservationListByDate(GregorianCalendar date) {
+		String retValue = "";
+		String s = utils.MyUtils.dateToString(date);
+		String[] subarray = s.split("/");
+		subarray[1].replaceAll("0", "");
+		String aNew = subarray[0] + "/" + subarray[1] + "/" + subarray[2];
+		date = utils.MyUtils.stringToDate(aNew);
+		Node<Reservation> head = this.first;
+		while (head != null) {
+			if (head.data.getEndDateAsString().equals(aNew) || head.data.getStartDateAsString().equals(aNew)) {
+				retValue += head.data.toString();
+				retValue += "\n";
+			}
+			head = head.link;
+		}
+		return retValue;
+	}
+
+	// receives: nothing
+	// returns: true if the list contains given reservation false if not in list.
+	// uses equals method and assumes it is overloaded for Reservation-derived instances
+	public boolean contains(Reservation reservation) {
+		Node<Reservation> head = this.first;
+		while (head != null) {
+			if (head.data.equals(reservation)) {
+				return true;
+			}
+			head = head.link;
+		}
+		return false;
+	}
+
+	// receives: reservation to be added to this reservation list instance
+	// returns: true if received reservation is added to list if not in list already returns true if added, false if not
+	//       assumes equals is overloaded 
+	//      list remains sorted by start date at all times (from earliest date to latest date)
+	public boolean add(Reservation reservation) {
+		
+		if (this.count == ReservationList.MAX_SIZE) {
+			return false;
+		}
+		if (this.contains(reservation) == true) {
+			return false;
+		}
+		Node<Reservation> toAdd = new Node<Reservation>(reservation);
+		Node<Reservation> head = this.first;
+		Node<Reservation> prev = null;
+		String[] reserveDates = reservation.getStartDateAsString().split("/");
+		for (int x = 0; x < this.count; x++) {
+			String[] headDates = head.data.getStartDateAsString().split("/");
+			if (reserveDates[2].compareTo(headDates[2]) < 0) {
+				break;
+			}
+			if (reserveDates[2].compareTo(headDates[2]) == 0) {
+				if (reserveDates[0].compareTo(headDates[0]) < 0) {
+					break;
+				}
+			}
+			if (reserveDates[2].compareTo(headDates[2]) == 0) {
+				if (reserveDates[0].compareTo(headDates[0]) <= 0) {
+					if (reserveDates[1].compareTo(headDates[1]) < 0 || reserveDates[1].length() < headDates[1].length()) {
+						break;
+					}
+				}
+			}
+			//System.out.println(this.toString());
+			//if (reservation.getStartDateAsString().compareTo(head.data.getStartDateAsString()) < 0) {
+				//break;
+			//}
+			prev = head;
+			head = head.link;
+		}
+		if (prev == null) {
+			toAdd.link = this.first;
+			this.first = toAdd;
+		}
+		else {
+			toAdd.link = prev.link;
+			prev.link = toAdd;
+		}
+		this.count++;
+		return true;
+	}
+
+	// receives: a position in this list to retrieve a reservation from
+	// returns: the reservation in the list at given position.
+	//       uses zero-based positions, so 0 is the position of the first reservation in the list
+	//       returns null if received position is out of range for this reservation list instance.
+	//  Example use:
+	//        ReservationList resList = new ReservationListImpl("reservations.txt");
+	//        Reservation t1 = resList.get(0);
+	//        assertTrue(t1!=null);
+	public Reservation get(int position) {
+		if (position < 0 || position >= this.count) return null;
+		Node<Reservation> head = this.first;
+		for (int x = 0; x < this.count; ++x) {
+			if (x == position) {
+				break;
+			}
+			else {
+				head = head.link;
+			}
+		}
+		return head.data;
+	}
+
+	// receives: reservation to find in this list instance
+	// post: returns the position of received reservation in the list
+	//       (uses equals method which is overloaded when matching)
+	//       returns -1 if received reservation is not found in current list at any position
+	//  Example use:
+	//        ReservationList list = new ReservationListImpl("reservation.txt");
+	//        HotelReservation hotelRes = new HotelReservation("aabb","3/15/2018", "4/12/2018", "Mariott", 2);
+	//		  int position = list.find(hotelRes);
+	//	      assertTrue(position != -1);
+	public int find(Reservation reservation) {
+		Node<Reservation> head = this.first;
+		for (int x = 0; x < this.count; ++x) {
+			if (head.data.equals(reservation)) {
+				return x;
+			}
+			head = head.link;
+		}
+		return -1;
+	}
+
+	// receives: reservation to locate in this list
+	// returns:  reservation  in list that matches given reservation, removes it from list
+	//       list remains sorted by date after removal. (most recent to least recent)
+	//  	    if reservation in not in the list, returns null
+	public Reservation remove(Reservation reservation) {
+		if (this.contains(reservation) == false) {
+			return null;
+		}
+		if (this.count == 0) {
+			return null;
+		}
+		Reservation retValue = null;
+		Node<Reservation> head = this.first;
+		Node<Reservation> prev = null;
+		for (int x = 0; x < this.count; x++) {
+			if (head.data.equals(reservation)) {
+				retValue = head.data;
+				break;
+			}
+			prev = head;
+			head = head.link;
+		}
+		if (prev == null) {
+			this.first = head.link;
+		}
+		else {
+			prev.link = head.link;
+			head.link = null;
+		}
+		this.count--;
+		return retValue;
+		
+	}
+
+	// receives: nothing
+	// returns: nothing
+	//  removes all reservations from this list, so it's size becomes 0
+	public void clear() {
+		this.first = null;
+		this.count = 0;
+	}
+
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+package reservation;
+
+import java.io.PrintWriter;
+import java.util.GregorianCalendar;
+import java.util.Scanner;
+
+public class ReservationUtilsImpl {
+	// receives: inFile, a Scanner instance already open and ready for reading 
+	//  tries to read one Reservation derived instance from file, 
+	// if successful, creates Reservation-derived instance, populates it, returns it, assumes data in order expected
+	// returns null if no data on inFile to read, returns populated Reservation-derived instance otherwise
+	public static Reservation readFromScanner(Scanner inFile) {
+		if (!inFile.hasNext()) {
+			return null;
+		}
+		Reservation aReservation = null;
+		String dataType = inFile.next().trim();
+		String confirmationID;
+		String startDate;
+		String endDate;
+		String personCount;
+		String hotelName;
+		String vin;
+		String make;
+		String year;
+		String depart;
+		String arrive;
+		if (!dataType.equals("HOTEL") && !dataType.equals("CAR") && !dataType.equals("FLIGHT")) {
+			return null;
+		}
+		if (inFile.hasNext()) {
+			confirmationID = inFile.next();
+		}
+		else {
+			return null;
+		}
+		if (inFile.hasNext()) {
+			startDate = inFile.next();
+		}
+		else {
+			return null;
+		}
+		if (inFile.hasNext()) {
+			endDate = inFile.nextLine().trim();
+		}
+		else {
+			return null;
+		}
+		if (dataType.equals("HOTEL")) {
+			if (inFile.hasNext()) {
+				personCount = inFile.next();
+			}
+			else {
+				return null;
+			}
+			if (inFile.hasNext()) {
+				hotelName = inFile.nextLine().trim();
+			}
+			else {
+				return null;
+			}
+			HotelReservation aHotel = new HotelReservation(confirmationID);
+			aHotel.setEndDate(startDate);
+			aHotel.setStartDate(endDate);
+			aHotel.setHotelName(hotelName);
+			Integer a = Integer.valueOf(personCount);
+			aHotel.setNumPersons(a);
+			aReservation = aHotel;
+		}
+		else if (dataType.equals("CAR")) {
+			if (inFile.hasNext()) {
+				// Changed trim
+				vin = inFile.next();
+			}
+			else {
+				return null;
+			}
+			if (inFile.hasNext()) {
+				year = inFile.next();
+			}
+			else {
+				return null;
+			}
+			if (inFile.hasNextLine()) {
+				make = inFile.nextLine().trim();
+			}
+			else {
+				return null;
+			}
+			CarReservation aCar = new CarReservation(confirmationID);
+			aCar.setStartDate(startDate);
+			aCar.setEndDate(endDate);
+			CarMake aMake = CarMake.valueOf(make);
+			Integer years = Integer.valueOf(year);
+			RentalCar current = new RentalCar(vin, years, aMake);
+			aCar.setCar(current);
+			aReservation = aCar;
+		}
+		else if (dataType.equals("FLIGHT")) {
+			if (inFile.hasNext()) {
+				depart = inFile.next();
+			}
+			else {
+				return null;
+			}
+			if (inFile.hasNext()) {
+				arrive = inFile.nextLine().trim();
+			}
+			else {
+				return null;
+			}
+			FlightReservation aFlight = new FlightReservation(confirmationID);
+			aFlight.setStartDate(startDate);
+			aFlight.setEndDate(endDate);
+			aFlight.setArrivalCode(arrive);
+			aFlight.setDepartCode(depart);
+			aReservation = aFlight;
+			
+		}
+	
+		return aReservation;
+	}
+	
+	// receives: reservation to write, outFile, already open and ready to be written to 
+	//  writes received reservation instance to file in same format as read in with 
+	//  including leading HOTEL or CAR or FLIGHT on first line of output
+	//returns: nothing
+	public static void writeToFile(PrintWriter outFile, Reservation reservation) {
+		if (reservation instanceof HotelReservation) {
+			HotelReservation aHotel = (HotelReservation) reservation;
+			outFile.print("HOTEL ");
+			outFile.print(aHotel.getConfirmationNumber() + " ");
+			outFile.print(aHotel.getStartDateAsString() + " ");
+			outFile.print(aHotel.getEndDateAsString());
+			outFile.println();
+			outFile.print(aHotel.getNumPersons() + " ");
+			outFile.print(aHotel.getHotelName());
+			outFile.println();
+		}
+		else if (reservation instanceof CarReservation) {
+			CarReservation aCar = (CarReservation) reservation;
+			outFile.print("CAR ");
+			outFile.print(aCar.getConfirmationNumber() + " ");
+			outFile.print(aCar.getStartDateAsString() + " ");
+			outFile.print(aCar.getEndDateAsString());
+			outFile.println();
+			RentalCar current = aCar.getCar();
+			outFile.print(current.getVin() + " ");
+			outFile.print(current.getYear() + " ");
+			outFile.print(current.getMake());
+			outFile.println();
+		}
+		else if (reservation instanceof FlightReservation) {
+			FlightReservation aFlight = (FlightReservation) reservation;
+			outFile.print("FLIGHT ");
+			outFile.print(aFlight.getConfirmationNumber() + " ");
+			outFile.print(aFlight.getStartDateAsString() + " ");
+			outFile.print(aFlight.getEndDateAsString() + " ");
+			outFile.println();
+			outFile.print(aFlight.getDepartCode() + " ");
+			outFile.print(aFlight.getArrivalCode());
+			outFile.println();
+		}
+	}
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+package reservationlist;
+
+import java.io.PrintWriter;
+import java.util.GregorianCalendar;
+import java.util.Scanner;
+
+import reservation.CarMake;
+import reservation.CarReservation;
+import reservation.FlightReservation;
+import reservation.HotelReservation;
+import reservation.RentalCar;
+import reservation.Reservation;
+
+public class ReservationListUtilsImpl {
+	//receives: inFile, a Scanner already open and ready to read from
+	//  reservationList, a list of reservations to add to from inFile if any reservations found
+	//reads from inFile as many reservations as it can, puts each one into reservationList 
+	//pre: inFile is open and ready to read from
+	//all reservations found on inFile are added to reservationList using add method in ReservationList interface
+	//returns: nothing
+	public static void readFromScanner(Scanner inFile, ReservationList reservationList) {
+		while (inFile.hasNext()) {
+			String dataType = inFile.next().trim();
+			String confirmationID;
+			String startDate;
+			String endDate;
+			int personCount;
+			String hotelName;
+			String vin;
+			String make;
+			String year;
+			String depart;
+			String arrive;
+			if (!dataType.equals("HOTEL") && !dataType.equals("CAR") && !dataType.equals("FLIGHT")) {
+				return;
+			}
+			if (inFile.hasNext()) {
+				confirmationID = inFile.next();
+			}
+			else {
+				return;
+			}
+			if (inFile.hasNext()) {
+				startDate = inFile.next();
+			}
+			else {
+				return;
+			}
+			if (inFile.hasNext()) {
+				endDate = inFile.nextLine().trim();
+			}
+			else {
+				return;
+			}
+			if (dataType.equals("HOTEL")) {
+				if (inFile.hasNext()) {
+					personCount = inFile.nextInt();
+				}
+				else {
+					return;
+				}
+				if (inFile.hasNext()) {
+					hotelName = inFile.nextLine().trim();
+				}
+				else {
+					return;
+				}
+				
+				HotelReservation aHotel = new HotelReservation(confirmationID);
+				aHotel.setEndDate(startDate);
+				aHotel.setStartDate(endDate);
+				aHotel.setHotelName(hotelName);
+				aHotel.setNumPersons(personCount);
+				reservationList.add(aHotel);
+			}
+			else if (dataType.equals("CAR")) {
+				if (inFile.hasNext()) {
+					vin = inFile.next();
+				}
+				else {
+					return;
+				}
+				if (inFile.hasNext()) {
+					year = inFile.next();
+				}
+				else {
+					return;
+				}
+				if (inFile.hasNext()) {
+					make = inFile.nextLine().trim();
+				}
+				else {
+					return;
+				}
+				CarReservation aCar = new CarReservation(confirmationID);
+				aCar.setStartDate(startDate);
+				aCar.setEndDate(endDate);
+				CarMake aMake = CarMake.valueOf(make);
+				Integer years = Integer.valueOf(year);
+				RentalCar current = new RentalCar(vin, years, aMake);
+				aCar.setCar(current);
+				reservationList.add(aCar);
+			}
+			else if (dataType.equals("FLIGHT")) {
+				if (inFile.hasNext()) {
+					depart = inFile.next();
+				}
+				else {
+					return;
+				}
+				if (inFile.hasNext()) {
+					arrive = inFile.nextLine().trim();
+				}
+				else {
+					return;
+				}
+				FlightReservation aFlight = new FlightReservation(confirmationID);
+				aFlight.setStartDate(startDate);
+				aFlight.setEndDate(endDate);
+				aFlight.setArrivalCode(arrive);
+				aFlight.setDepartCode(depart);
+				reservationList.add(aFlight);
+			}
+		}
+	}
+	// receives: outFile, an open and ready to write to PrintWriter instance
+	//  reservationList, a list to be written to outFile in data format (so it can be read back in later)
+	//writes received reservation list to received outFile in same format as read in with descriptor 
+	//on each line describing which type of reservation is on the line
+	//pre: outFile is open and ready to print to
+	//post: outFile contains entire contents of list written in same format
+	//as input format
+	public static void writeToFile(PrintWriter outFile, ReservationList reservationList) {
+		int stop = reservationList.getSize();
+		
+		for (int x = 0; x < stop; x++) {
+			Reservation current = reservationList.get(x);
+			if (current instanceof HotelReservation) {
+				HotelReservation aHotel = (HotelReservation) current;
+				outFile.print("HOTEL ");
+				outFile.print(aHotel.getConfirmationNumber() + " ");
+				outFile.print(aHotel.getStartDateAsString() + " ");
+				outFile.print(aHotel.getEndDateAsString());
+				outFile.println();
+				outFile.print(aHotel.getNumPersons() + " ");
+				outFile.print(aHotel.getHotelName());
+				outFile.println();
+			}
+			else if (current instanceof CarReservation) {
+				CarReservation aCar = (CarReservation) current;
+				outFile.print("CAR ");
+				outFile.print(aCar.getConfirmationNumber() + " ");
+				outFile.print(aCar.getStartDateAsString() + " ");
+				outFile.print(aCar.getEndDateAsString());
+				outFile.println();
+				RentalCar newCar = aCar.getCar();
+				outFile.print(newCar.getVin() + " ");
+				outFile.print(newCar.getYear() + " ");
+				outFile.print(newCar.getMake());
+				outFile.println();
+			}
+			else if (current instanceof FlightReservation) {
+				FlightReservation aFlight = (FlightReservation) current;
+				outFile.print("FLIGHT ");
+				outFile.print(aFlight.getConfirmationNumber() + " ");
+				outFile.print(aFlight.getStartDateAsString() + " ");
+				outFile.print(aFlight.getEndDateAsString());
+				outFile.println();
+				outFile.print(aFlight.getDepartCode() + " ");
+				outFile.print(aFlight.getArrivalCode());
+				outFile.println();
+			}
+		}
+	}
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+Enter your name: Geoff
+********BEGIN TESTING FOR Geoff ***********
+Execution Geoff -- BEGINS reservationTestHotel()  at: 2019-04-05 01:32:00
+Today is: 4/5/2019
+hotel1: HOTEL confirmation #: 1111 starts: 3/15/2020 ends: 3/21/2020 Hyatt Hill Country Resort 1
+hotel2: HOTEL confirmation #: AAAA starts: 4/5/2019 ends: 4/5/2019 $$$$ 1
+Execution Geoff -- ENDS reservationTestHotel()  at: 2019-04-05 01:32:00
+Execution Geoff -- BEGINS reservationTestCar()  at: 2019-04-05 01:32:00
+Car Reservation: CAR confirmation #: XXYY starts: 3/15/2020 ends: 3/15/2020 vin: 8899 year: 2018 make: NISSAN
+Execution Geoff -- ENDS reservationTestCar()  at: 2019-04-05 01:32:00
+Execution Geoff -- BEGINS reservationTestFlight()  at: 2019-04-05 01:32:00
+Flight reservation: FLIGHT confirmation #: F222 starts: 5/1/2019 ends: 5/10/2019 ATL AUS
+FLIGHT confirmation #: F222 starts: 5/1/2019 ends: 5/10/2019 ATL AUS
+FLIGHT confirmation #: F222 starts: 5/1/2019 ends: 5/11/2019 AUS AUS
+-220634937
+666868744
+Execution Geoff -- ENDS reservationTestFlight()  at: 2019-04-05 01:32:00
+Execution Geoff BEGINS reservationListTestGetFind Test  at: 2019-04-05 01:32:00
+Should see 2 Reservations:
+FLIGHT confirmation #: F111 starts: 4/6/2020 ends: 4/8/2020 DAL SAT
+HOTEL confirmation #: H111 starts: 4/12/2020 ends: 4/21/2020 Hyatt Austin 2
+
+Should see 4 Reservations:
+CAR confirmation #: C111 starts: 3/28/2020 ends: 3/30/2020 vin: 1211 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F111 starts: 4/6/2020 ends: 4/8/2020 DAL SAT
+HOTEL confirmation #: H111 starts: 4/12/2020 ends: 4/21/2020 Hyatt Austin 2
+HOTEL confirmation #: H111 starts: 6/12/2020 ends: 6/21/2020 Mariott 3
+
+Execution Geoff END reservationListTestGetFind Test  at: 2019-04-05 01:32:00
+Execution Geoff BEGINS reservationListTestSizeContainsAdd Test  at: 2019-04-05 01:32:00
+Here is current list:
+HOTEL confirmation #: H222 starts: 4/5/2019 ends: 4/13/2020 Hyatt Dallas 2
+CAR confirmation #: C222 starts: 3/28/2020 ends: 3/30/2020 vin: 1211 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F222 starts: 4/6/2020 ends: 4/9/2020 DAL AUS
+FLIGHT confirmation #: F111 starts: 4/6/2020 ends: 4/8/2020 DAL SAT
+
+Execution Geoff ENDS reservationListTestSizeContainsAdd Test  at: 2019-04-05 01:32:00
+Execution Geoff BEGINS Test reservationListFindByDate()  at: 2019-04-05 01:32:00
+
+Here is the list after adding 6 reservations 
+CAR confirmation #: C222 starts: 3/27/2020 ends: 4/12/2020 vin: 2222 year: 2017 make: FORD
+CAR confirmation #: C111 starts: 3/28/2020 ends: 3/30/2020 vin: 1111 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F222 starts: 4/3/2020 ends: 4/7/2020 DAL AUS
+FLIGHT confirmation #: F111 starts: 4/6/2020 ends: 4/8/2020 DAL SAT
+HOTEL confirmation #: H111 starts: 4/8/2020 ends: 4/12/2020 Hyatt Austin 2
+HOTEL confirmation #: H222 starts: 4/12/2020 ends: 4/22/2020 Hyatt Dallas 4
+
+num lines for date: 4/03/2020 = 1
+FLIGHT confirmation #: F222 starts: 4/3/2020 ends: 4/7/2020 DAL AUS
+
+num lines for date: 4/12/2020 = 3
+CAR confirmation #: C222 starts: 3/27/2020 ends: 4/12/2020 vin: 2222 year: 2017 make: FORD
+HOTEL confirmation #: H111 starts: 4/8/2020 ends: 4/12/2020 Hyatt Austin 2
+HOTEL confirmation #: H222 starts: 4/12/2020 ends: 4/22/2020 Hyatt Dallas 4
+
+num lines for date: 4/06/2020 = 1
+FLIGHT confirmation #: F111 starts: 4/6/2020 ends: 4/8/2020 DAL SAT
+
+num lines for date: 4/30/2020 = 0
+num lines for date: 3/27/2020 = 1
+num lines for date: 9/3/2020 = 0
+Execution Geoff ENDS Test reservationListFindByDate()  at: 2019-04-05 01:32:00
+Execution Geoff BEGINS Test reservationListFindByDate()  at: 2019-04-05 01:32:00
+Geoff Here is the list of 6 reservation(s)
+HOTEL confirmation #: H222 starts: 4/5/2019 ends: 4/13/2020 Hyatt Dallas 2
+HOTEL confirmation #: H111 starts: 4/5/2019 ends: 4/12/2020 Hyatt Austin 2
+CAR confirmation #: C222 starts: 3/28/2020 ends: 3/30/2020 vin: 1211 year: 2018 make: TOYOTA
+CAR confirmation #: C111 starts: 3/28/2020 ends: 3/30/2020 vin: 1211 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F222 starts: 4/6/2020 ends: 4/9/2020 DAL AUS
+FLIGHT confirmation #: F111 starts: 4/6/2020 ends: 4/8/2020 DAL SAT
+
+Geoff here is the UGLY toString() for GregorianCalendar date1: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id="America/Chicago",offset=-21600000,dstSavings=3600000,useDaylight=true,transitions=235,lastRule=java.util.SimpleTimeZone[id=America/Chicago,offset=-21600000,dstSavings=3600000,useDaylight=true,startYear=0,startMode=3,startMonth=2,startDay=8,startDayOfWeek=1,startTime=7200000,startTimeMode=0,endMode=3,endMonth=10,endDay=1,endDayOfWeek=1,endTime=7200000,endTimeMode=0]],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2020,MONTH=2,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=15,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=0,HOUR_OF_DAY=0,MINUTE=0,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?]
+Execution Geoff ENDS Test reservationListTestSortRemoveClear  at: 2019-04-05 01:32:00
+Execution Geoff -- BEGINS reservationTestFileIO()  at: 2019-04-05 01:32:00
+********Now testing methods in ReservationUtilsImpl
+SUCCESS opened file: reservation6.txt for input
+Just read: HOTEL confirmation #: H111 starts: 4/5/2019 ends: 3/20/2020 Hyatt Regency Austin 2
+Just read: CAR confirmation #: C445 starts: 4/5/2019 ends: 2/22/2020 vin: 2288 year: 2018 make: TOYOTA
+Just read: FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+Just read: HOTEL confirmation #: H334 starts: 4/5/2019 ends: 4/30/2020 Mariott Austin 4
+Just read: CAR confirmation #: AAAA starts: 4/5/2019 ends: 6/12/2020 vin: 2288 year: 2018 make: TOYOTA
+Just read: FLIGHT confirmation #: F888 starts: 4/5/2019 ends: 4/12/2020 AUS DEN
+SUCCESS read 6 reservations from reservation6.txt
+Geoff ********Now Testing writeToFile...
+SUCCESS opened file: reservation6.txt for input
+Just read: HOTEL confirmation #: H111 starts: 4/5/2019 ends: 3/20/2020 Hyatt Regency Austin 2
+Just read: CAR confirmation #: C445 starts: 4/5/2019 ends: 2/22/2020 vin: 2288 year: 2018 make: TOYOTA
+Just read: FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+Just read: HOTEL confirmation #: H334 starts: 4/5/2019 ends: 4/30/2020 Mariott Austin 4
+Just read: CAR confirmation #: AAAA starts: 4/5/2019 ends: 6/12/2020 vin: 2288 year: 2018 make: TOYOTA
+Just read: FLIGHT confirmation #: F888 starts: 4/5/2019 ends: 4/12/2020 AUS DEN
+SUCCESS read 6 reservations from reservation6Out.txt
+SUCCESS opened file: reservation6Out.txt for input
+Just read: HOTEL confirmation #: H111 starts: 4/5/2019 ends: 4/5/2019 Hyatt Regency Austin 2
+Just read: CAR confirmation #: C445 starts: 4/5/2019 ends: 2/22/2020 vin: 2288 year: 2018 make: TOYOTA
+Just read: FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+Just read: HOTEL confirmation #: H334 starts: 4/5/2019 ends: 4/5/2019 Mariott Austin 4
+Just read: CAR confirmation #: AAAA starts: 4/5/2019 ends: 6/12/2020 vin: 2288 year: 2018 make: TOYOTA
+Just read: FLIGHT confirmation #: F888 starts: 4/5/2019 ends: 4/12/2020 AUS DEN
+SUCCESS read 6 reservations from reservation6Out.txt
+SUCCESS opened file: reservation1.txt for input
+Just read: FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+SUCCESS read 1 reservations from reservation1Out.txt
+********Now testing methods in ReservationListUtilsImpl*******
+SUCCESS opened file: reservation6.txt for input
+After reading list from reservation6.txt
+HOTEL confirmation #: H111 starts: 4/5/2019 ends: 3/20/2020 Hyatt Regency Austin 2
+CAR confirmation #: C445 starts: 4/5/2019 ends: 2/22/2020 vin: 2288 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+HOTEL confirmation #: H334 starts: 4/5/2019 ends: 4/30/2020 Mariott Austin 4
+CAR confirmation #: AAAA starts: 4/5/2019 ends: 6/12/2020 vin: 2288 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F888 starts: 4/5/2019 ends: 4/12/2020 AUS DEN
+
+Just wrote list to file: reservation6out.txt
+SUCCESS opened file: reservation6out.txt for input
+After reading list from reservation6out.txt
+HOTEL confirmation #: H111 starts: 4/5/2019 ends: 4/5/2019 Hyatt Regency Austin 2
+CAR confirmation #: C445 starts: 4/5/2019 ends: 2/22/2020 vin: 2288 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+HOTEL confirmation #: H334 starts: 4/5/2019 ends: 4/5/2019 Mariott Austin 4
+CAR confirmation #: AAAA starts: 4/5/2019 ends: 6/12/2020 vin: 2288 year: 2018 make: TOYOTA
+FLIGHT confirmation #: F888 starts: 4/5/2019 ends: 4/12/2020 AUS DEN
+
+SUCCESS opened file: reservation1.txt for input
+After reading list from reservation1.txt
+FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+
+Just wrote list to file: reservation1out.txt
+SUCCESS opened file: reservation1out.txt for input
+After reading list from reservation1out.txt
+FLIGHT confirmation #: F111 starts: 4/5/2019 ends: 4/24/2020 AUS HOU
+
+********COMPLETE testing methods in ReservationListUtilsImpl******
+Execution Geoff -- ENDS reservationTestFileIO()  at: 2019-04-05 01:32:00
+********END OF TESTING FOR Geoff ***********

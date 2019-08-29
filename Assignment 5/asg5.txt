@@ -1,0 +1,735 @@
+Geoff Arroyo
+COSC 2425
+Assignment 5
+----------------------------------------------------------------------------------------------------------
+
+package housepetlist;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
+
+import housepet.GenderType;
+import housepet.HousePet;
+import housepet.PetType;
+
+public class HousePetListImpl implements HousePetList {
+	private HousePet[] houseList;
+	private int numPets;
+	
+	//This is the default constructor for the HousePetListImpl class. This allocates enough space
+	//in the instance's houseList array for the MAX_SIZE constant which was provided by interface
+	public HousePetListImpl() {
+		this.houseList = new HousePet[HousePetList.MAX_SIZE];
+		this.numPets = 0;
+	}
+	
+	//This is the second constructor that receives a text file name as input. The constructor
+	//Will instantiate the field array of house pets with the data that is read in from the text
+	//file using a scanner instance. 
+	public HousePetListImpl(String filename) {
+		this.numPets = 0;
+		this.houseList = new HousePet[HousePetList.MAX_SIZE];
+		String petName = "";
+		int year = 0;
+		String theGender = "";
+		String kindOfPet = "";
+		File fileId = new File(filename);
+		try {
+			Scanner storeFiles = new Scanner(fileId);
+			while (true) {
+				if (this.numPets >= HousePetList.MAX_SIZE) {
+					break;
+				}
+				if (storeFiles.hasNextLine()) {
+					petName = storeFiles.nextLine();
+				}
+				else {
+					break;
+				}
+				if (storeFiles.hasNextInt()) {
+					year = storeFiles.nextInt();
+					storeFiles.nextLine();
+				}
+				else {
+					break;
+				}
+				if (storeFiles.hasNextLine()) {
+					theGender = storeFiles.nextLine();
+				}
+				else {
+					break;
+				}
+				if (storeFiles.hasNextLine()) {
+					kindOfPet = storeFiles.nextLine();
+				}
+				else {
+					break;
+				}
+				GenderType petGender = GenderType.valueOf(theGender);
+				PetType filePetType = PetType.valueOf(kindOfPet);
+				HousePet myPet = new HousePet(petName, year, petGender, filePetType);
+				this.houseList[this.numPets] = myPet;
+				this.numPets++;
+			}
+			storeFiles.close();
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//receives: nothing
+		// returns: number of HousePets currently in the list
+		//  Example use
+		//  HousePetList list = new HousePetListImpl();  // create empty list of HousePet instances
+		//   assertTrue(list.getSize() == 0);   // size should be 0
+		//  boolean result = list.add(new HousePet("Tweety Bird", 2012, Gender.MALE, PetType.BIRD));
+		//  assertTrue(list.getSize() == 1);
+	public int getSize() {
+		return this.numPets;
+	}
+
+	// receives: a HousePet instance that is NOT null
+		// returns:  true if received housepet matches any housepet in this list,
+		//          assumes equals is overloaded in HousePet class
+		//          returns false if received housepet is not currently in this list
+	public boolean contains(HousePet housepet) {
+		for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].equals(housepet)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//receives: a HousePet instance that is NOT null
+		//task:   housepet is added to this list if not already contained in this list
+		//      (house pets must be unique so no two matching pets should be in the list)
+		//returns:  true if housepet was added, false if no room in the list or duplicate
+		//      housepet is found in the list
+		//      a housepet is a duplicate if it is equal to any other housepet instance
+		//      precondition: HousePet overrrides equals methed
+		//      Example use:
+		//        HousePetList list = new HousePetListImpl();
+		//        boolean result = list.add(new HousePet("Sporty Sport", 2014, Gender.MALE, PetType.GERBIL));
+		//        assertTrue(result == true);
+	public boolean add(HousePet housepet) {
+		if (this.numPets >= HousePetList.MAX_SIZE) return false;
+		if (this.contains(housepet) == true) return false;
+		/*for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].equals(housepet)) {
+				return false;
+			}
+		}*/
+		this.houseList[this.numPets] = housepet;
+		this.numPets++;
+		return true;
+	}
+
+	// receives: a positon (int) in this house pet list
+		// returns: the housepet in the list at given position.
+		//       uses zero-based positions, so 0 is the position of the first house pet in the list
+		//       returns null if received position is out of range (0 to less than size of list.)
+		//  Example use:
+		//        HousePetList list = new HousePetListImpl();
+		//        HousePet pet2 = new HousePet("SillyCat", 2010, Gender.FEMALE, PetType.CAT));
+		//        boolean result = list.add(pet2);
+		// 		  HousePet pet1 = list.get(0);
+		//        assertTrue(pet1.equals(pet2));
+	public HousePet get(int position) {
+		if (position < 0 || position >= this.numPets) return null;
+		return this.houseList[position];
+	}
+
+	// receives: a HousePet instance (not null)
+		// returns:  the position of received housepet in the list (0 based positioning)
+		//       (uses overloaded equals when matching)
+		//       returns -1 if received housepet is not found in current list at any position
+		//        HousePetList list = new HousePetListImpl();
+		//        HousePet pet2 = new HousePet("Biggy Big", 2010, Gender.MALE, PetType.POTBELLY_PIG));
+		//        boolean result = list.add(pet2);
+		//		  int position = list2.find(pet2);
+		//	      assertTrue(position == 0);
+	public int find(HousePet housepet) {
+		for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].equals(housepet)) {
+				return x;
+			}
+		}
+		return -1;
+	}
+
+	// receives: a PetType value
+		// returns: a String containing a list (1 house pet per line) of house pets
+		//      that have the received PetType value.
+		//      returns an EMPTY String if NO house pets have the received PetType value
+		//    Example use:
+		//	  HousePetList list = new HousePetListImpl();
+		//        HousePet pet2 = new HousePet("Paul the Parrot", 2004, Gender.MALE, PetType.BIRD);
+		//        boolean result = list.add(pet2);
+		//        assertTrue(result == true);
+		// 		String list1 = list.getHousePetsMatchingPetType(PetType.DOG);
+		//        assertTrue(list1.equals(""));
+		//        list1 = list.getHousePetsMatchingPetType(PetType.BIRD);
+		//        assertEquals(1, utils.MyUtils.countNewLines(list1));
+	public String getHousePetsMatchingPetType(PetType matchingType) {
+		String retValue = "";
+		for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].getPetType().toString().equals(matchingType.toString())) {
+				retValue += this.houseList[x].getPetName() + " ";
+				retValue += this.houseList[x].getYearBorn() + " ";
+				retValue += this.houseList[x].getGenderType() + " ";
+				retValue += this.houseList[x].getPetType();
+				retValue += "\n";
+			}
+		}
+		return retValue;
+	}
+
+	// receives: a Gender value
+		// returns: a String containing a list (1 house pet per line) of house pets
+		//       that are of the received account type.
+		//    Example use:
+		//        HousePetList list = new HousePetListImpl();
+		//        HousePetList list = new HousePetListImpl();
+		//        HousePet pet2 = new HousePet("Paul the Parrot", 2004, Gender.MALE, PetType.BIRD);
+		//        boolean result = list.add(pet2);
+		//        assertTrue(result == true);
+		// 		String list1 = list.getHousePetsMatchingGender(Gender.UNKNOWN);
+		//        assertTrue(list1.equals(""));
+		//        list1 = list.getHousePetsMatchingGender(Gender.MALE);
+		//        assertEquals(1, utils.MyUtils.numberLines(list1));
+	public String getHousePetsMatchingGender(GenderType aGender) {
+		String retValue = "";
+		for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].getGenderType().toString().equals(aGender.toString())) {
+				retValue += this.houseList[x].getPetName() + " ";
+				retValue += this.houseList[x].getYearBorn() + " ";
+				retValue += this.houseList[x].getGenderType() + " ";
+				retValue += this.houseList[x].getPetType();
+				retValue += "\n";
+			}
+		}
+		return retValue;
+	}
+
+	// receives: a pet's name (String)
+		// returns: a String containing a list (1 house pet per line) of house pets
+		//      with name matching  received String
+		//      if no matches exist, returns empty string
+		//  Example use:
+		//	HousePetList list = new HousePetListImpl();
+		//        HousePet pet2 = new HousePet("Paul the Parrot", 2004, Gender.MALE, PetType.BIRD);
+		//        boolean result = list.add(pet2);
+		//        assertTrue(result == true);
+		// 		String list1 = list.getHousePetsMatchingName("PAUL the PARROT");
+		//        assertEquals(1, utils.MyUtils.numberLines(list1));
+	public String getHousePetsMatchingName(String aName) {
+		String retValue = "";
+		aName = utils.MyUtils.properFormat(aName);
+		for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].getPetName().equalsIgnoreCase(aName)) {
+				retValue += this.houseList[x].getPetName() + " ";
+				retValue += this.houseList[x].getYearBorn() + " ";
+				retValue += this.houseList[x].getGenderType() + " ";
+				retValue += this.houseList[x].getPetType();
+				retValue += "\n";
+			}
+		}
+		return retValue;
+	}
+
+	// receives: nothing
+		// returns: nothing
+		// task:   this HousePetList is sorted by pet name from lowest alphabetically to highest
+		//  Example use (give 2 more):
+		//	HousePetList list = new HousePetListImpl();
+		//      HousePet pet1 = new HousePet("Paul the Parrot", 2004, Gender.MALE, PetType.BIRD);
+		//      boolean result = list.add(pet1);
+		//      assertTrue(result == true);
+		//      HousePet pet2 = new HousePet("Crazy cat",2012, Gender.FEMALE, PetType.CAT);
+		//      HousePet pet3 = new HousePet("prince", 2018, Gender.MALE, PetType.DOG);
+		//      boolean result = list.add(pet2);
+		//      assertTrue(result == true);
+		// 	list.sortByName();
+		//      System.out.println("here is the sorted list:\n" + list);  // should be in appropriate order smallest name  to largest
+		//       should output:
+		//
+		//         Crazy Cat 7 years FEMALE CAT
+		//         Paul The Parrot 15 years MALE BIRD
+		//         Prince 1 years MALE DOG
+		// HousePet pet1 = new HousePet("Charlie", 2011, Gender.MALE, PetType.CAT);
+		// HousePet pet2 = new HousePet("David", 2010, ,Gender.MALE, PetType.DOG);
+		// HousePet pet3 = new HousePet("Oprah", 2009, Gender.FEMALE, PetType.BIRD);
+		// HousePetList list = new HousePetListImpl();
+		// boolean t = list.add(pet1);
+		// boolean b = list.add(pet2);
+		// boolean a = list.add(pet3);
+		// list.sortByName();
+		// System.out.println(list) :
+		// Charlie ..... 
+		// David .......
+		// Oprah .......
+	public void sortByName() {
+		for (int x = 0; x < this.numPets; x++) {
+			String smallest = this.houseList[x].getPetName();
+			int swapIndex = x;
+			for (int y = x; y < this.numPets - 1; y++) {
+				if (this.houseList[y + 1].getPetName().compareTo(smallest) < 0) {
+					smallest = this.houseList[y + 1].getPetName();
+					swapIndex = y + 1;
+				}
+			}
+			HousePet temp = this.houseList[x];
+			this.houseList[x] = this.houseList[swapIndex];
+			this.houseList[swapIndex] = temp;
+		}
+		
+	}
+
+	// receives: nothing
+		// returns: nothing
+		// task:   this HousePetList is sorted by age of pet, from HIGHEST to LOWEST
+		//  Example use (give 2 more):
+		//	HousePetList list = new HousePetListImpl();
+		//      HousePet pet1 = new HousePet("Paul the Parrot", 2004, Gender.MALE, PetType.BIRD);
+		//      boolean result = list.add(pet1);
+		//      assertTrue(result == true);
+		//      HousePet pet2 = new HousePet("Crazy cat",2012, Gender.FEMALE, PetType.CAT);
+		//      HousePet pet3 = new HousePet("prince", 2018, Gender.MALE, PetType.DOG);
+		//      boolean result = list.add(pet2);
+		//      assertTrue(result == true);
+		// 	list.sortByName();
+		//      System.out.println("here is the sorted list:\n" + list);  // should be in appropriate order smallest name  to largest
+		//       should output:
+		//
+		//         Prince 1 years MALE DOG
+		//         Crazy Cat 7 years FEMALE CAT
+		//         Paul The Parrot 15 years MALE BIRD
+	// HousePet pet1 = new HousePet("Charlie", 2011, Gender.MALE, PetType.CAT);
+			// HousePet pet2 = new HousePet("David", 2010, ,Gender.MALE, PetType.DOG);
+			// HousePet pet3 = new HousePet("Oprah", 2012, Gender.FEMALE, PetType.BIRD);
+			// HousePetList list = new HousePetListImpl();
+			// boolean t = list.add(pet1);
+			// boolean b = list.add(pet2);
+			// boolean a = list.add(pet3);
+			// list.sortByAge();
+			// System.out.println(list) :
+			// Oprah 7 years ..... 
+			// Charlie 8 years .......
+			// David 9 years .......
+	public void sortByAge() {
+		for (int x = 0; x < this.numPets; x++) {
+			int smallest = this.houseList[x].getYearBorn();
+			int swapIndex = x;
+			for (int y = x; y < this.numPets - 1; y++) {
+				if (this.houseList[y + 1].getYearBorn() < smallest) {
+					smallest = this.houseList[y + 1].getYearBorn();
+					swapIndex = y + 1;
+				}
+			}
+			HousePet temp = this.houseList[x];
+			this.houseList[x] = this.houseList[swapIndex];
+			this.houseList[swapIndex] = temp;
+		}
+		
+	}
+
+	// receives: a HousePet instance, not null
+		// returns:   a HousePet instance  in this list that is found that MATCHES the
+		//      received housepet (assume equals is overloaded for HousePet)
+		//      the HousePet instance in the list that matched received housepet is removed
+		//       from this list AND RETURNED.
+		//       If no HousePet instance is found that matches received housepet
+		//       then null is RETURNED
+		//    Example use:
+		//      HousePetList list = new HousePetListImpl();
+		//        HousePet pet2 = new HousePet("Paul the Parrot", 2004, Gender.MALE, PetType.BIRD);
+
+		//      HousePet pet3 = new HousePet("Silly Bird", 2017, Gender.FEMALE, PetType.BIRD);
+		//      boolean result = list.add(pet3);
+		//      assertTrue(result == true);
+		//      boolean result = list.add(pet2);
+		//      assertTrue(result == true);
+		//      assertTrue(list.getSize() ==2);
+		//      HousePet remPet = list.remove(pet2);
+		//      assertTrue(remPet.equals(pet2));
+		//      assertTrue(list.getSize() == 1);
+		//     Example use #2:
+		//        remPet = list.remove(pet2)
+		//        assertEquals(null, remPet);
+	public HousePet remove(HousePet housepet) {
+		boolean wasFound = false;
+		int storeIndex = 0;
+		for (int x = 0; x < this.numPets; ++x) {
+			if (this.houseList[x].equals(housepet)) {
+				wasFound = true;
+				storeIndex = x;
+				break;
+			}
+		}
+		if (wasFound == false) {
+			return null;
+		}
+		HousePet temp = this.houseList[storeIndex];
+		this.houseList[storeIndex] = this.houseList[this.numPets - 1];
+		this.houseList[this.numPets - 1] = null;
+		this.numPets--;
+		return temp;
+	}
+
+	// receives: nothing
+		// returns: nothing
+		// task:  this HousePetList instance is made to be empty
+		//        clear out all house pets from this instance
+	public void clear() {
+		for (int x = 0; x < this.numPets; ++x) {
+			this.houseList[x] = null;
+		}
+		
+		this.numPets = 0;
+	}
+	
+	//Override the default toString method so that we can see the fields of each HousePet in our array of HousePets.
+	public String toString() {
+		String retValue = "";
+		for (int x = 0; x < this.numPets; x++) {
+			retValue += this.houseList[x].getPetName() + " ";
+			retValue += this.houseList[x].getYearBorn() + " ";
+			retValue += this.houseList[x].getGenderType() + " ";
+			retValue += this.houseList[x].getPetType();
+			retValue += "\n";
+		}
+		
+		return retValue;
+	}
+
+}
+
+----------------------------------------------------------------------------------------------------------
+
+package housepetlist;
+
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+import housepet.GenderType;
+import housepet.HousePet;
+import housepet.PetType;
+
+public class HousePetListUtilsImpl {
+	// receives: inFile, a Scanner instance that is open and ready to read data from
+    //          aList, a HousePetList instance that is populated with house pets from received Scanner
+    //
+    // task:  populates aList with any house pets found on scanner (adds to aList as it reads accounts)
+	//   invalid data on scanner stops reading
+	//   stops reading when end of input or when aList reaches MAX_SIZE
+	//   or when attempting to read an account and bad data is found
+	// Example use: Scanner infile = new Scanner(new File("test.txt"));
+	//              HousePetList myList = new HousePetList();
+	//              readFromScanner(infile, myList);
+	public static void readFromScanner(Scanner scanner, HousePetList aList) {
+		int numPets = 0;
+		boolean isExit = false;
+		String petName = "";
+		int yearBorn = 0;
+		String genderType = "";
+		String petType = "";
+		while (true) {
+			if (numPets >= HousePetList.MAX_SIZE) {
+				break;
+			}
+			if (scanner.hasNextLine()) {
+				petName = scanner.nextLine();
+			}
+			else {
+				break;
+			}
+			if (scanner.hasNextInt()) {
+				yearBorn = scanner.nextInt();
+				scanner.nextLine();
+			}
+			else {
+				break;
+			}
+			if (scanner.hasNextLine()) {
+				genderType = scanner.nextLine();
+			}
+			else {
+				break;
+			}
+			if (scanner.hasNextLine()) {
+				petType = scanner.nextLine();
+			}
+			else {
+				break;
+			}
+			GenderType petGender = GenderType.valueOf(genderType);
+			PetType filePetType = PetType.valueOf(petType);
+			HousePet myPet = new HousePet(petName, yearBorn, petGender, filePetType);
+			aList.add(myPet);
+			numPets++;
+		}
+	}
+	
+	//receives: out, a PrintWriter that is open and ready to write to,
+		//         aList, a HousePetList instance to write out to the given PrintWriter
+		//
+		// task:  out contains current house pet list in program readable format
+	public static void writeToFile(PrintWriter out, HousePetList aList) {
+		int stop = aList.getSize();
+		for (int x = 0; x < stop; x++) {
+			HousePet current = aList.get(x);
+			out.println(current.getPetName());
+			out.println(current.getYearBorn());
+			out.println(current.getGenderType());
+			out.println(current.getPetType());
+		}
+	}
+}
+
+---------------------------------------------------------------------------------------------------------
+
+Enter your name: Geoff
+*********Now testing constructors for HousePet instances
+SUCCESS expected Aa$$$$ for HousePet
+SUCCESS expected Aa$$$$
+SUCCESS expected Shirley Ann Marie
+SUCCESS expected Aa$$$$
+SUCCESS expected 2019 for HousePet
+SUCCESS expected 2019 for HousePet
+SUCCESS expected 2011 for HousePet
+SUCCESS expected 2019 for HousePet
+Now testing setter/getter for petName
+SUCCESS expected Queen Anne Margaret
+SUCCESS expected Aa$$$$
+SUCCESS expected Aa$$$$
+SUCCESS expected Aa$$$$
+SUCCESS expected Aa$$$$
+SUCCESS expected $%^&*kk
+SUCCESS expected $ Aba
+SUCCESS expected Aa$$$$
+SUCCESS expected King George
+SUCCESS expected Shirley Ann Marie
+SUCCESS expected Aa$$$$
+SUCCESS expected Aa$$$$
+Pet 1:  Name: Queen Anne Margaret Year: 0 Gender: UNKNOWN Pet Type: UNKNOWN
+Pet 2:  Name: Aa$$$$ Year: 0 Gender: UNKNOWN Pet Type: UNKNOWN
+Pet 3:  Name: Shirley Ann Marie Year: 8 Gender: FEMALE Pet Type: CAT
+Pet 4:  Name: King George Year: 0 Gender: MALE Pet Type: BIRD
+SUCCESS expected 2019 for year born
+SUCCESS expected 1900 for year born
+SUCCESS expected 2019 for year born
+SUCCESS expected 2019 for year born
+SUCCESS expected 2008 for year born
+Testing Complete for HousePet methods
+Current list should have 3 pets: 
+Crazy Cat 2014 MALE LIZARD
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Shirley Ann Marie 2011 FEMALE CAT
+
+Testing Complete for add() and contains()
+Current list should have 3 pets: 
+Crazy Cat 2014 MALE LIZARD
+Stormy Bleu 2015 MALE BIRD
+Shirley Ann Marie 2011 FEMALE CAT
+
+Testing Complete for get() and find ()
+Pets matching FEMALE  should be 2
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Miss Perfect 2011 FEMALE CAT
+
+Pets matching MALE  should be 2
+Crazy Cat 2014 MALE LIZARD
+Smoky Bear 2017 MALE LIZARD
+
+Pets matching UNKNOWN  should be 0
+
+Pets matching FEMALE  should be 0
+
+Current pet list: 
+Crazy Cat 2014 MALE LIZARD
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Miss Perfect 2011 FEMALE CAT
+Smoky Bear 2017 MALE LIZARD
+
+Pets matching BIRD  should be 0
+
+Pets matching DOG  should be 0
+
+Pets matching CAT  should be 1
+Miss Perfect 2011 FEMALE CAT
+
+Pets matching POTBELLY_PIG  should be 1
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+
+Pets matching LIZARD  should be 2
+Crazy Cat 2014 MALE LIZARD
+Smoky Bear 2017 MALE LIZARD
+
+Pets matching GERBIL from empty list should be 0
+
+Pets with name CrAZY CAT  should be 1
+Crazy Cat 2014 MALE LIZARD
+
+Pets with name   SMOKY   BEAR    should be 1
+Smoky Bear 2017 MALE LIZARD
+
+Pets with name   SPorty RABbit    should be 0
+
+Pets with name   miss    perFect    should be 2
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Miss Perfect 2011 FEMALE CAT
+
+Pets with name   miss    perFect   from empty list should be 0
+
+Unsorted list of pets: 
+Smoky Bear 2017 MALE LIZARD
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Miss Perfect 2011 FEMALE CAT
+Crazy Cat 2014 MALE LIZARD
+
+Sorted BY NAME: 
+Crazy Cat 2014 MALE LIZARD
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Miss Perfect 2011 FEMALE CAT
+Smoky Bear 2017 MALE LIZARD
+
+ Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD is at index: 0 CORRECTLY
+ Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD is at index: 3 CORRECTLY
+List of 1 Pet Sorted BY NAME: 
+Smoky Bear 2017 MALE LIZARD
+
+ Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD in list of 1 Pet is at index: 0 CORRECTLY
+ Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD in list of 1 Pet is at index: -1 CORRECTLY
+Empty List of Pets Sorted BY NAME: 
+Smoky Bear 2017 MALE LIZARD
+
+Empty list of pets contains no pets CORRECTLY
+ Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD is not in empty List of Pets index: -1 CORRECT
+Sorted BY AGE: 
+Miss Perfect 2011 FEMALE CAT
+Crazy Cat 2014 MALE LIZARD
+Miss Perfect 2016 FEMALE POTBELLY_PIG
+Smoky Bear 2017 MALE LIZARD
+
+ Name: Miss Perfect Year: 8 Gender: FEMALE Pet Type: CAT is at index: 0 CORRECTLY
+ Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD is at index: 1 CORRECTLY
+ Name: Miss Perfect Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG is at index: 2 CORRECTLY
+ Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD is at index: 3 CORRECTLY
+List of 1 Pet Sorted BY AGE: 
+Smoky Bear 2017 MALE LIZARD
+
+Empty List of Pets Sorted BY Age: 
+
+Expected returned: null when removing  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+   returned value: null
+Expected return: null when removing  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG
+ returned value: null
+**Current pet list of 4 pets**
+Crazy Cat 2014 MALE LIZARD
+Smoky Bear 2017 MALE LIZARD
+Miss Perfect 2011 FEMALE CAT
+Miss Lola 2016 FEMALE POTBELLY_PIG
+
+Expected returned:  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD when removing  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+   returned value:  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+Expected returned: null when removing  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+   returned value: null
+Expected returned:  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG when removing  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG
+   returned value:  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG
+Expected returned: null when removing  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG
+   returned value: null
+Expected returned:  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD when removing  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD
+   returned value:  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD
+**Current list of 3 pets**
+Smoky Bear 2017 MALE LIZARD
+Crazy Cat 2014 MALE LIZARD
+Miss Lola 2016 FEMALE POTBELLY_PIG
+
+**Current list of 0 pets**
+
+**Current list of 1 pets**
+Miss Lola 2016 FEMALE POTBELLY_PIG
+
+Expected returned: null when removing  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+   returned value: null
+**Current list of 4 pets**
+Miss Lola 2016 FEMALE POTBELLY_PIG
+Smoky Bear 2017 MALE LIZARD
+Miss Perfect 2011 FEMALE CAT
+Crazy Cat 2014 MALE LIZARD
+
+Expected returned:  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD when removing  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD
+   returned value:  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD
+**Current list of 3 pets**
+Miss Lola 2016 FEMALE POTBELLY_PIG
+Crazy Cat 2014 MALE LIZARD
+Miss Perfect 2011 FEMALE CAT
+
+Expected returned:  Name: Miss Perfect Year: 8 Gender: FEMALE Pet Type: CAT when removing  Name: Miss Perfect Year: 8 Gender: FEMALE Pet Type: CAT
+   returned value:  Name: Miss Perfect Year: 8 Gender: FEMALE Pet Type: CAT
+**Current list of 2 pets**
+Miss Lola 2016 FEMALE POTBELLY_PIG
+Crazy Cat 2014 MALE LIZARD
+
+Expected returned:  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG when removing  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG
+   returned value:  Name: Miss Lola Year: 3 Gender: FEMALE Pet Type: POTBELLY_PIG
+**Current list of 1 pets**
+Crazy Cat 2014 MALE LIZARD
+
+Expected returned:  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD when removing  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+   returned value:  Name: Crazy Cat Year: 5 Gender: MALE Pet Type: LIZARD
+**Current list of 0 pets**
+
+Expected returned: null when removing  Name: Smoky Bear Year: 2 Gender: MALE Pet Type: LIZARD
+   returned value: null
+**Current list of 0 pets**
+
+**Current list of 0 pets**
+
+Constructing HousePetList from file: housepet.txt
+Just created pet list from file: housepet.txt
+Zoey The Cat Princess 2010 FEMALE CAT
+Rugby Toughy 2012 MALE DOG
+Sweety Tweety 2002 MALE BIRD
+Skippy Doo 2016 UNKNOWN GERBIL
+Zippity Doo 2016 UNKNOWN GERBIL
+Miss Wonderful 2013 FEMALE POTBELLY_PIG
+
+Constructing HousePetList from file: housepetFour.txt
+Just created pet list from file: housepetFour.txt
+Miss Wonderful 2013 FEMALE POTBELLY_PIG
+Kevin David 2018 FEMALE GERBIL
+Shirley Ann Marie 2011 FEMALE BIRD
+Joe Mark Jr. 2014 MALE POTBELLY_PIG
+
+Constructing HousePetList from file: housepetOne.txt
+Just created pet list from file: housepetOne.txt
+Miss Wonderful 2013 FEMALE POTBELLY_PIG
+
+Constructing HousePetList from file: housepet1Out.txt
+Just created pet list from file: housepet1Out.txt
+Miss Wonderful 2013 FEMALE POTBELLY_PIG
+
+Constructing HousePetList from file: housepetEmpty.txt
+Just created pet list from file: housepetEmpty.txt
+
+Constructing HousePetList from file: housepetFour.txt
+Just created pet list from file: housepetFour.txt
+Miss Wonderful 2013 FEMALE POTBELLY_PIG
+Kevin David 2018 FEMALE GERBIL
+Shirley Ann Marie 2011 FEMALE BIRD
+Joe Mark Jr. 2014 MALE POTBELLY_PIG
+
+Constructing HousePetList from file: housepet4Out.txt
+Just created pet list from file: housepet4Out.txt
+Miss Wonderful 2013 FEMALE POTBELLY_PIG
+Kevin David 2018 FEMALE GERBIL
+Shirley Ann Marie 2011 FEMALE BIRD
+Joe Mark Jr. 2014 MALE POTBELLY_PIG
+
+ #######  Geoff Testing COMPLETE
